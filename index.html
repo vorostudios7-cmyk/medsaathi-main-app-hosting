@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedSaathi — Your Family Health Companion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark:   #0A5C45;
+      --green-mid:    #0F7A5A;
+      --green-light:  #1AAF82;
+      --green-pale:   #D6F5EC;
+      --green-glow:   #A8EDD6;
+      --amber:        #F59E0B;
+      --amber-pale:   #FEF3C7;
+      --blue-pale:    #EFF6FF;
+      --blue-mid:     #3B82F6;
+      --text-dark:    #0D1F1A;
+      --text-mid:     #2D5248;
+      --text-muted:   #6B8F83;
+      --white:        #FFFFFF;
+      --bg:           #F4FBF8;
+      --card-bg:      #FFFFFF;
+      --radius-lg:    20px;
+      --radius-md:    14px;
+      --radius-sm:    10px;
+      --shadow-sm:    0 2px 12px rgba(10,92,69,0.08);
+      --shadow-md:    0 6px 28px rgba(10,92,69,0.13);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 6%;
+      background: rgba(244,251,248,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(10,92,69,0.08);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--green-mid);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--green-dark); letter-spacing: -0.3px; }
+    .nav-logo-text span { color: var(--green-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: color .2s; }
+    .nav-links a:hover { color: var(--green-mid); }
+    .nav-cta {
+      background: var(--green-mid); color: var(--white);
+      padding: 10px 22px; border-radius: 50px;
+      font-size: 14px; font-weight: 600; text-decoration: none;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 2px 10px rgba(15,122,90,0.3);
+    }
+    .nav-cta:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 6% 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg-circle {
+      position: absolute; border-radius: 50%;
+      background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+      opacity: 0.45; pointer-events: none;
+    }
+    .hero-bg-circle.c1 { width: 600px; height: 600px; top: -150px; left: -180px; }
+    .hero-bg-circle.c2 { width: 400px; height: 400px; bottom: -80px; right: -100px; opacity: 0.3; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--green-pale); color: var(--green-dark);
+      padding: 7px 16px; border-radius: 50px;
+      font-size: 13px; font-weight: 600;
+      border: 1px solid var(--green-glow);
+      margin-bottom: 28px;
+      animation: fadeUp .6s ease both;
+    }
+    .hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-light); animation: pulse 2s infinite; }
+
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes slideLeft { from{opacity:0;transform:translateX(-32px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes slideRight { from{opacity:0;transform:translateX(32px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes scaleIn { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
+    @keyframes navSlide { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+
+    /* nav entrance */
+    nav { animation: navSlide .5s ease both; }
+
+    /* scroll-reveal base state */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.from-left  { transform: translateX(-32px); }
+    .reveal.from-right { transform: translateX(32px); }
+    .reveal.scale      { transform: scale(0.93); }
+    .reveal.visible {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 68px);
+      font-weight: 700; line-height: 1.1;
+      color: var(--text-dark);
+      letter-spacing: -1.5px;
+      max-width: 820px;
+      animation: fadeUp .7s .1s ease both;
+    }
+    .hero h1 .highlight {
+      color: var(--green-mid);
+      position: relative; display: inline-block;
+    }
+    .hero h1 .highlight::after {
+      content: '';
+      position: absolute; bottom: 2px; left: 0; right: 0; height: 4px;
+      background: var(--green-glow); border-radius: 4px; z-index: -1;
+    }
+
+    .hero-sub {
+      font-family: 'Noto Sans', sans-serif;
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--text-muted);
+      max-width: 560px; line-height: 1.7;
+      margin: 22px auto 38px;
+      animation: fadeUp .7s .2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp .7s .3s ease both;
+    }
+    .btn-primary {
+      background: var(--green-mid); color: var(--white);
+      padding: 15px 34px; border-radius: 50px;
+      font-size: 16px; font-weight: 600; text-decoration: none;
+      box-shadow: 0 4px 18px rgba(15,122,90,0.35);
+      transition: background .2s, transform .15s, box-shadow .2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(15,122,90,0.4); }
+    .btn-secondary {
+      background: var(--white); color: var(--green-dark);
+      padding: 15px 30px; border-radius: 50px;
+      font-size: 16px; font-weight: 600; text-decoration: none;
+      border: 1.5px solid var(--green-glow);
+      transition: border-color .2s, transform .15s;
+    }
+    .btn-secondary:hover { border-color: var(--green-mid); transform: translateY(-2px); }
+
+    .hero-price-note {
+      margin-top: 18px; font-size: 13px; color: var(--text-muted);
+      animation: fadeUp .7s .4s ease both;
+    }
+    .hero-price-note strong { color: var(--green-dark); }
+
+    /* ── TRUST STRIP ── */
+    .trust-strip {
+      display: flex; align-items: center; justify-content: center;
+      gap: 36px; flex-wrap: wrap;
+      padding: 28px 6%;
+      border-top: 1px solid rgba(10,92,69,0.08);
+      border-bottom: 1px solid rgba(10,92,69,0.08);
+      background: var(--white);
+    }
+    .trust-item { display: flex; align-items: center; gap: 9px; }
+    .trust-icon { font-size: 20px; }
+    .trust-text { font-size: 13px; font-weight: 600; color: var(--text-mid); }
+
+    /* ── FEATURES ── */
+    .section { padding: 90px 6%; }
+    .section-label {
+      display: inline-block;
+      font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--green-mid); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(26px, 4vw, 42px); font-weight: 700;
+      color: var(--text-dark); letter-spacing: -0.8px; line-height: 1.2;
+      max-width: 520px; margin-bottom: 14px;
+    }
+    .section-sub {
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 16px; color: var(--text-muted); line-height: 1.7;
+      max-width: 480px; margin-bottom: 52px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px 26px;
+      border: 1px solid rgba(10,92,69,0.08);
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s, box-shadow .2s;
+      cursor: default;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .feature-card.accent { background: var(--green-dark); border-color: var(--green-dark); }
+    .feature-card.accent .feature-title,
+    .feature-card.accent .feature-desc { color: var(--white); }
+    .feature-card.accent .feature-desc { opacity: .75; }
+    .feature-emoji { font-size: 32px; margin-bottom: 18px; display: block; }
+    .feature-title { font-size: 17px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+    .feature-desc { font-family: 'Noto Sans', sans-serif; font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+    .feature-tag {
+      display: inline-block; margin-top: 14px;
+      background: var(--green-pale); color: var(--green-dark);
+      font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+    }
+    .feature-card.accent .feature-tag { background: rgba(255,255,255,0.15); color: var(--white); }
+
+    /* ── HOW IT WORKS ── */
+    .how-section { background: var(--white); }
+    .steps { display: flex; flex-direction: column; gap: 0; max-width: 640px; }
+    .step { display: flex; gap: 22px; align-items: flex-start; }
+    .step-left { display: flex; flex-direction: column; align-items: center; }
+    .step-num {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--green-mid); color: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-connector { width: 2px; flex: 1; min-height: 36px; background: var(--green-pale); margin: 4px 0; }
+    .step-body { padding-bottom: 32px; }
+    .step-title { font-size: 17px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+    .step-desc { font-family: 'Noto Sans', sans-serif; font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+
+    /* ── PRICING ── */
+    .pricing-card {
+      max-width: 460px; margin: 0 auto;
+      background: var(--green-dark);
+      border-radius: var(--radius-lg); padding: 44px 40px;
+      text-align: center; color: var(--white);
+      box-shadow: 0 12px 48px rgba(10,92,69,0.28);
+      position: relative; overflow: hidden;
+    }
+    .pricing-card::before {
+      content: ''; position: absolute;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,175,130,0.2) 0%, transparent 70%);
+      top: -80px; right: -80px; pointer-events: none;
+    }
+    .pricing-label { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .7; margin-bottom: 18px; }
+    .pricing-price { font-size: 64px; font-weight: 700; letter-spacing: -2px; line-height: 1; }
+    .pricing-price sup { font-size: 28px; vertical-align: super; letter-spacing: 0; }
+    .pricing-once { font-size: 14px; opacity: .6; margin: 8px 0 28px; }
+    .pricing-features { list-style: none; text-align: left; display: flex; flex-direction: column; gap: 12px; margin-bottom: 34px; }
+    .pricing-features li { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+    .pricing-features li::before { content: '✓'; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .pricing-btn {
+      display: block; width: 100%;
+      background: var(--white); color: var(--green-dark);
+      padding: 16px; border-radius: 50px;
+      font-size: 16px; font-weight: 700; text-decoration: none;
+      transition: opacity .2s, transform .15s;
+    }
+    .pricing-btn:hover { opacity: .92; transform: translateY(-1px); }
+    .pricing-note { font-size: 13px; opacity: .55; margin-top: 16px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--text-dark); color: var(--white);
+      padding: 40px 6%; text-align: center;
+    }
+    .footer-logo { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+    .footer-logo span { color: var(--green-light); }
+    .footer-tagline { font-size: 13px; opacity: .45; margin-bottom: 20px; }
+    .footer-links { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .footer-links a { font-size: 13px; color: rgba(255,255,255,0.5); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--green-light); }
+    .footer-copy { font-size: 12px; opacity: .3; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero h1 { letter-spacing: -0.8px; }
+      .hero { padding: 100px 5% 60px; }
+      .trust-strip { gap: 14px; padding: 20px 5%; justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .trust-strip::-webkit-scrollbar { display: none; }
+      .trust-item { flex-shrink: 0; }
+      .pricing-card { padding: 32px 22px; }
+      .pricing-price { font-size: 52px; }
+      .hero-actions { flex-direction: column; width: 100%; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; text-align: center; }
+      .section { padding: 60px 5%; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 400px) {
+      .nav-cta { font-size: 12px; padding: 8px 14px; }
+      .pricing-price { font-size: 44px; }
+    }
+  </style>
+  <!-- ── PWA ── paste this before </head> in all 3 HTML files ── -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="MedSaathi"/>
+<meta name="theme-color" content="#0A5C45"/>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('MedSaathi PWA ready!'))
+        .catch(err => console.log('SW error:', err));
+    });
+  }
+</script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">💊</div>
+      <span class="nav-logo-text">Med<span>Saathi</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <a class="nav-cta" href="#pricing">Get MedSaathi — ₹399</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-circle c1"></div>
+    <div class="hero-bg-circle c2"></div>
+
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Trusted family health companion
+    </div>
+
+    <h1>Never miss a <span class="highlight">medicine</span><br/>ever again</h1>
+
+    <p class="hero-sub">
+      MedSaathi reminds your entire family — medicines, water, meals, and doctor visits.
+      Simple enough for dadi, smart enough for everyone.
+    </p>
+
+    <div class="hero-actions">
+      <a class="btn-primary" href="#pricing">
+        Start for ₹399 &nbsp;→
+      </a>
+      <a class="btn-secondary" href="#features">See features</a>
+    </div>
+
+    <p class="hero-price-note">
+      <strong>One-time payment.</strong> No monthly charges. No subscriptions. Ever.
+    </p>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <div class="trust-strip">
+    <div class="trust-item reveal" data-delay="0"><span class="trust-icon">🏥</span><span class="trust-text">Trusted by families</span></div>
+    <div class="trust-item reveal" data-delay="80"><span class="trust-icon">🔒</span><span class="trust-text">100% private & secure</span></div>
+    <div class="trust-item reveal" data-delay="160"><span class="trust-icon">📱</span><span class="trust-text">Works on any phone</span></div>
+    <div class="trust-item reveal" data-delay="240"><span class="trust-icon">🇮🇳</span><span class="trust-text">Made for India</span></div>
+    <div class="trust-item reveal" data-delay="320"><span class="trust-icon">💸</span><span class="trust-text">Pay once, use forever</span></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <span class="section-label reveal from-left">Features</span>
+    <h2 class="section-title reveal" data-delay="80">Everything your family needs to stay healthy</h2>
+    <p class="section-sub reveal" data-delay="160">Four powerful tools in one simple app — designed for every generation in your family.</p>
+
+    <div class="features-grid">
+      <div class="feature-card accent reveal" data-delay="0">
+        <span class="feature-emoji">💊</span>
+        <div class="feature-title">Medicine reminders</div>
+        <div class="feature-desc">Set reminders for every medicine, every family member. Morning, afternoon, night — never miss a dose again.</div>
+        <span class="feature-tag">Most used</span>
+      </div>
+      <div class="feature-card reveal" data-delay="100">
+        <span class="feature-emoji">💧</span>
+        <div class="feature-title">Water & meal reminders</div>
+        <div class="feature-desc">Gentle reminders throughout the day to drink water and eat on time. Build healthy habits effortlessly.</div>
+        <span class="feature-tag">Daily habit</span>
+      </div>
+      <div class="feature-card reveal" data-delay="200">
+        <span class="feature-emoji">🏆</span>
+        <div class="feature-title">Health streaks & rewards</div>
+        <div class="feature-desc">Stay motivated with daily streaks. Every day you follow your routine, your streak grows. Watch your health improve over time.</div>
+        <span class="feature-tag">Stay motivated</span>
+      </div>
+      <div class="feature-card reveal" data-delay="300">
+        <span class="feature-emoji">🩺</span>
+        <div class="feature-title">Doctor appointments</div>
+        <div class="feature-desc">Log upcoming doctor visits and get reminders before each one. Never forget a checkup or follow-up again.</div>
+        <span class="feature-tag">Never miss a visit</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section how-section" id="how">
+    <span class="section-label reveal from-left">How it works</span>
+    <h2 class="section-title reveal" data-delay="80">Set up in 3 minutes. Benefit for years.</h2>
+    <p class="section-sub reveal" data-delay="160">No technical knowledge needed. If you can use WhatsApp, you can use MedSaathi.</p>
+
+    <div class="steps">
+      <div class="step reveal from-left" data-delay="0">
+        <div class="step-left">
+          <div class="step-num">1</div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Add your family members</div>
+          <div class="step-desc">Enter names for each person in your family — parents, grandparents, children. Each gets their own profile.</div>
+        </div>
+      </div>
+      <div class="step reveal from-left" data-delay="150">
+        <div class="step-left">
+          <div class="step-num">2</div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Set up their reminders</div>
+          <div class="step-desc">Add medicines, water schedule, meal times, and doctor appointments for each family member in seconds.</div>
+        </div>
+      </div>
+      <div class="step reveal from-left" data-delay="300">
+        <div class="step-left">
+          <div class="step-num">3</div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-title">Get reminders, build streaks</div>
+          <div class="step-desc">MedSaathi reminds you at the right time, every day. Complete your tasks, grow your streak, stay healthy.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section" id="pricing" style="background: var(--bg);">
+    <span class="section-label reveal">Pricing</span>
+    <h2 class="section-title reveal" data-delay="80" style="text-align:center;max-width:100%;margin-bottom:40px;">Simple, honest pricing</h2>
+
+    <div class="pricing-card reveal scale" data-delay="160">
+      <div class="pricing-label">Lifetime access</div>
+      <div class="pricing-price"><sup>₹</sup>399</div>
+      <div class="pricing-once">One-time payment — yours forever</div>
+      <ul class="pricing-features">
+        <li>Medicine reminders for whole family</li>
+        <li>Water & meal reminders</li>
+        <li>Health streaks & rewards</li>
+        <li>Doctor appointment reminders</li>
+        <li>Works on any phone or tablet</li>
+        <li>Free updates forever</li>
+      </ul>
+      <a class="pricing-btn" href="#">Get MedSaathi Now</a>
+      <p class="pricing-note">No subscription. No hidden charges. Pay once, use forever.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo reveal">Med<span>Saathi</span></div>
+    <div class="footer-tagline reveal" data-delay="80">Your family's daily health companion</div>
+    <div class="footer-links reveal" data-delay="160">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Contact Us</a>
+    </div>
+    <div class="footer-copy reveal" data-delay="240">© 2025 MedSaathi. Made with ❤️ in India.</div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const delay = parseInt(el.dataset.delay || 0);
+          setTimeout(() => el.classList.add('visible'), delay);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

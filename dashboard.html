@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedSaathi — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark:  #0A5C45;
+      --green-mid:   #0F7A5A;
+      --green-light: #1AAF82;
+      --green-pale:  #D6F5EC;
+      --green-glow:  #A8EDD6;
+      --amber:       #F59E0B;
+      --amber-pale:  #FEF3C7;
+      --red:         #EF4444;
+      --red-pale:    #FEE2E2;
+      --blue:        #3B82F6;
+      --blue-pale:   #EFF6FF;
+      --purple:      #8B5CF6;
+      --purple-pale: #EDE9FE;
+      --text-dark:   #0D1F1A;
+      --text-mid:    #2D5248;
+      --text-muted:  #6B8F83;
+      --white:       #FFFFFF;
+      --bg:          #F4FBF8;
+      --card:        #FFFFFF;
+      --border:      rgba(10,92,69,0.1);
+      --shadow-sm:   0 2px 12px rgba(10,92,69,0.07);
+      --shadow-md:   0 6px 24px rgba(10,92,69,0.12);
+      --radius-lg:   20px;
+      --radius-md:   14px;
+      --radius-sm:   10px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text-dark); min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .layout { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 240px; flex-shrink: 0;
+      background: var(--green-dark);
+      display: flex; flex-direction: column;
+      padding: 0; position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 50;
+      transition: transform .3s ease;
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px;
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      text-decoration: none;
+    }
+    .sidebar-logo-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: var(--green-light);
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .sidebar-logo-text { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+    .sidebar-logo-text span { color: var(--green-glow); }
+
+    .sidebar-section { padding: 18px 12px 6px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 0 8px; margin-bottom: 6px; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 11px;
+      padding: 11px 12px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.65);
+      cursor: pointer; transition: background .15s, color .15s;
+      margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+    .nav-item .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+    .nav-badge {
+      margin-left: auto; background: var(--green-light);
+      color: #fff; font-size: 10px; font-weight: 700;
+      padding: 1px 7px; border-radius: 20px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto; padding: 16px 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-footer a {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: rgba(255,255,255,0.4);
+      text-decoration: none; padding: 8px 10px; border-radius: 8px;
+      transition: color .15s;
+    }
+    .sidebar-footer a:hover { color: rgba(255,255,255,0.8); }
+
+    /* ── MAIN ── */
+    .main { margin-left: 240px; flex: 1; padding: 32px 36px; }
+
+    /* ── TOP BAR ── */
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .topbar-left h1 { font-size: 22px; font-weight: 700; color: var(--text-dark); letter-spacing: -.4px; }
+    .topbar-left p { font-size: 14px; color: var(--text-muted); margin-top: 3px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .date-badge {
+      background: var(--card); border: 1px solid var(--border);
+      padding: 8px 16px; border-radius: 50px;
+      font-size: 13px; font-weight: 500; color: var(--text-mid);
+      box-shadow: var(--shadow-sm);
+    }
+    .add-btn {
+      background: var(--green-mid); color: #fff;
+      border: none; padding: 10px 20px; border-radius: 50px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 7px;
+      font-family: 'Sora', sans-serif;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 3px 12px rgba(15,122,90,0.3);
+    }
+    .add-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+    /* ── FAMILY SELECTOR ── */
+    .family-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .family-label { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-right: 4px; }
+    .member-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 50px;
+      border: 1.5px solid var(--border); background: var(--card);
+      font-size: 13px; font-weight: 600; color: var(--text-mid);
+      cursor: pointer; transition: all .15s;
+      box-shadow: var(--shadow-sm);
+    }
+    .member-chip:hover { border-color: var(--green-mid); color: var(--green-mid); }
+    .member-chip.active { background: var(--green-mid); border-color: var(--green-mid); color: #fff; }
+    .member-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .member-chip.active .member-avatar { background: rgba(255,255,255,0.2); }
+    .add-member-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 50px;
+      border: 1.5px dashed var(--green-glow); background: transparent;
+      font-size: 13px; font-weight: 600; color: var(--green-mid);
+      cursor: pointer; transition: all .15s; font-family: 'Sora', sans-serif;
+    }
+    .add-member-btn:hover { background: var(--green-pale); }
+
+    /* ── STATS ROW ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--card); border-radius: var(--radius-md);
+      padding: 20px; border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-icon { font-size: 22px; margin-bottom: 12px; display: block; }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--text-dark); letter-spacing: -.8px; line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 5px; font-weight: 500; }
+    .stat-card.streak .stat-value { color: var(--amber); }
+    .stat-card.done-today .stat-value { color: var(--green-mid); }
+
+    /* ── REMINDERS GRID ── */
+    .reminders-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+
+    .reminder-section { background: var(--card); border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .reminder-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .reminder-section-title { display: flex; align-items: center; gap: 10px; }
+    .section-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+    .section-icon.med    { background: #D6F5EC; }
+    .section-icon.water  { background: #EFF6FF; }
+    .section-icon.doc    { background: #EDE9FE; }
+    .section-icon.meal   { background: #FEF3C7; }
+    .section-name { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+    .section-count { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .section-add-btn {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--green-pale); border: none;
+      color: var(--green-dark); font-size: 18px; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .15s, transform .1s; font-family: 'Sora', sans-serif;
+    }
+    .section-add-btn:hover { background: var(--green-glow); transform: scale(1.1); }
+
+    .reminder-list { padding: 8px 12px 12px; min-height: 60px; }
+    .reminder-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 10px; border-radius: var(--radius-sm);
+      transition: background .15s; cursor: default;
+      animation: slideIn .3s ease both;
+    }
+    @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .reminder-item:hover { background: var(--bg); }
+    .reminder-check {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--green-glow); background: none;
+      cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all .2s; font-size: 12px; color: transparent;
+    }
+    .reminder-check:hover { border-color: var(--green-mid); background: var(--green-pale); }
+    .reminder-check.checked { background: var(--green-mid); border-color: var(--green-mid); color: #fff; }
+    .reminder-info { flex: 1; min-width: 0; }
+    .reminder-name { font-size: 14px; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .reminder-name.done { text-decoration: line-through; color: var(--text-muted); }
+    .reminder-time { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .reminder-delete {
+      width: 26px; height: 26px; border-radius: 7px; border: none;
+      background: none; color: var(--text-muted); font-size: 14px;
+      cursor: pointer; opacity: 0; transition: opacity .15s, background .15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .reminder-item:hover .reminder-delete { opacity: 1; }
+    .reminder-delete:hover { background: var(--red-pale); color: var(--red); }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 28px 16px; color: var(--text-muted); text-align: center;
+    }
+    .empty-state-icon { font-size: 28px; margin-bottom: 8px; opacity: .5; }
+    .empty-state-text { font-size: 13px; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(13,31,26,0.5);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--card); border-radius: var(--radius-lg);
+      padding: 30px 28px; width: 100%; max-width: 420px;
+      box-shadow: 0 20px 60px rgba(10,92,69,0.2);
+      transform: translateY(20px) scale(0.97);
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    .modal-overlay.open .modal { transform: none; }
+    .modal-title { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 13px; font-weight: 600; color: var(--text-mid); margin-bottom: 6px; display: block; }
+    .form-input, .form-select {
+      width: 100%; padding: 11px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border); background: var(--bg);
+      font-size: 14px; font-family: 'Sora', sans-serif; color: var(--text-dark);
+      outline: none; transition: border-color .2s;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--green-mid); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+    .btn-cancel {
+      flex: 1; padding: 12px; border-radius: 50px; border: 1.5px solid var(--border);
+      background: none; font-size: 14px; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; font-family: 'Sora', sans-serif; transition: border-color .2s;
+    }
+    .btn-cancel:hover { border-color: var(--text-muted); }
+    .btn-save {
+      flex: 2; padding: 12px; border-radius: 50px;
+      background: var(--green-mid); border: none;
+      font-size: 14px; font-weight: 600; color: #fff;
+      cursor: pointer; font-family: 'Sora', sans-serif;
+      transition: background .2s, transform .15s;
+    }
+    .btn-save:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+    /* ── MEMBER MODAL ── */
+    .emoji-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .emoji-opt {
+      width: 38px; height: 38px; border-radius: 9px; font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: 2px solid transparent; background: var(--bg);
+      transition: all .15s;
+    }
+    .emoji-opt:hover { background: var(--green-pale); }
+    .emoji-opt.selected { border-color: var(--green-mid); background: var(--green-pale); }
+
+
+    .hamburger { display: none; position: fixed; top: 16px; left: 16px; z-index: 200; background: var(--green-dark); border: none; border-radius: 10px; width: 40px; height: 40px; cursor: pointer; font-size: 18px; color: #fff; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: none; }
+      .hamburger { display: flex; align-items: center; justify-content: center; }
+      .main { margin-left: 0; padding: 70px 14px 28px; }
+      .topbar { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 18px; }
+      .topbar-left h1 { font-size: 18px; }
+      .topbar-right { width: 100%; justify-content: space-between; }
+      .date-badge { font-size: 12px; padding: 7px 12px; }
+      .add-btn { font-size: 13px; padding: 9px 16px; }
+      .family-bar { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .family-bar::-webkit-scrollbar { display: none; }
+      .member-chip { flex-shrink: 0; }
+      .add-member-btn { flex-shrink: 0; }
+      .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+      .stat-card { padding: 14px 12px; }
+      .stat-value { font-size: 22px; }
+      .stat-icon { font-size: 18px; margin-bottom: 8px; }
+      .reminders-grid { grid-template-columns: 1fr; gap: 14px; }
+      .reminder-item { padding: 10px 8px; }
+      .reminder-name { font-size: 13px; }
+      .reminder-delete { opacity: 1; }
+      .modal-overlay { align-items: flex-end; padding: 0; }
+      .modal { padding: 24px 18px; border-radius: 20px 20px 0 0; }
+    }
+    @media (max-width: 400px) {
+      .topbar-left h1 { font-size: 16px; }
+      .stat-value { font-size: 20px; }
+    }
+  </style>
+  <!-- ── PWA ── paste this before </head> in all 3 HTML files ── -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="MedSaathi"/>
+<meta name="theme-color" content="#0A5C45"/>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('MedSaathi PWA ready!'))
+        .catch(err => console.log('SW error:', err));
+    });
+  }
+</script>
+</head>
+<body>
+
+<!-- HAMBURGER (mobile) -->
+<button class="hamburger" onclick="toggleSidebar()" id="hamburger">☰</button>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-logo" href="index.html">
+      <div class="sidebar-logo-icon">💊</div>
+      <span class="sidebar-logo-text">Med<span>Saathi</span></span>
+    </a>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <button class="nav-item active" onclick="setTab('dashboard')">
+        <span class="nav-icon">🏠</span> Dashboard
+      </button>
+      <button class="nav-item" onclick="setTab('medicines')">
+        <span class="nav-icon">💊</span> Medicines
+        <span class="nav-badge" id="med-badge">0</span>
+      </button>
+      <button class="nav-item" onclick="setTab('water')">
+        <span class="nav-icon">💧</span> Water & Meals
+      </button>
+      <button class="nav-item" onclick="setTab('doctor')">
+        <span class="nav-icon">🩺</span> Doctor Visits
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Progress</div>
+      <button class="nav-item" onclick="setTab('streaks')">
+        <span class="nav-icon">🏆</span> Streaks
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <a href="index.html">← Back to home</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="greeting">Good morning! 👋</h1>
+        <p id="topbar-sub">Here's your family's health summary for today</p>
+      </div>
+      <div class="topbar-right">
+        <div class="date-badge" id="date-badge"></div>
+        <button class="add-btn" onclick="openAddModal()">+ Add reminder</button>
+      </div>
+    </div>
+
+    <!-- FAMILY SELECTOR -->
+    <div class="family-bar" id="family-bar">
+      <span class="family-label">Viewing:</span>
+      <!-- chips injected by JS -->
+      <button class="add-member-btn" onclick="openMemberModal()">+ Add member</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-icon">💊</span>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Total reminders</div>
+      </div>
+      <div class="stat-card done-today">
+        <span class="stat-icon">✅</span>
+        <div class="stat-value" id="stat-done">0</div>
+        <div class="stat-label">Done today</div>
+      </div>
+      <div class="stat-card streak">
+        <span class="stat-icon">🔥</span>
+        <div class="stat-value" id="stat-streak">0</div>
+        <div class="stat-label">Day streak</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🩺</span>
+        <div class="stat-value" id="stat-upcoming">0</div>
+        <div class="stat-label">Upcoming visits</div>
+      </div>
+    </div>
+
+    <!-- REMINDERS GRID -->
+    <div class="reminders-grid">
+
+      <!-- MEDICINES -->
+      <div class="reminder-section">
+        <div class="reminder-section-header">
+          <div class="reminder-section-title">
+            <div class="section-icon med">💊</div>
+            <div>
+              <div class="section-name">Medicines</div>
+              <div class="section-count" id="med-count">0 reminders</div>
+            </div>
+          </div>
+          <button class="section-add-btn" onclick="openAddModal('medicine')" title="Add medicine">+</button>
+        </div>
+        <div class="reminder-list" id="list-medicine"></div>
+      </div>
+
+      <!-- WATER & MEALS -->
+      <div class="reminder-section">
+        <div class="reminder-section-header">
+          <div class="reminder-section-title">
+            <div class="section-icon water">💧</div>
+            <div>
+              <div class="section-name">Water & Meals</div>
+              <div class="section-count" id="water-count">0 reminders</div>
+            </div>
+          </div>
+          <button class="section-add-btn" onclick="openAddModal('water')" title="Add reminder">+</button>
+        </div>
+        <div class="reminder-list" id="list-water"></div>
+      </div>
+
+      <!-- DOCTOR -->
+      <div class="reminder-section">
+        <div class="reminder-section-header">
+          <div class="reminder-section-title">
+            <div class="section-icon doc">🩺</div>
+            <div>
+              <div class="section-name">Doctor Visits</div>
+              <div class="section-count" id="doc-count">0 appointments</div>
+            </div>
+          </div>
+          <button class="section-add-btn" onclick="openAddModal('doctor')" title="Add appointment">+</button>
+        </div>
+        <div class="reminder-list" id="list-doctor"></div>
+      </div>
+
+      <!-- MEALS -->
+      <div class="reminder-section">
+        <div class="reminder-section-header">
+          <div class="reminder-section-title">
+            <div class="section-icon meal">🍽️</div>
+            <div>
+              <div class="section-name">Meal Reminders</div>
+              <div class="section-count" id="meal-count">0 reminders</div>
+            </div>
+          </div>
+          <button class="section-add-btn" onclick="openAddModal('meal')" title="Add meal">+</button>
+        </div>
+        <div class="reminder-list" id="list-meal"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ADD REMINDER MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Add Reminder</div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <select class="form-select" id="form-type" onchange="onTypeChange()">
+        <option value="medicine">💊 Medicine</option>
+        <option value="water">💧 Water reminder</option>
+        <option value="meal">🍽️ Meal reminder</option>
+        <option value="doctor">🩺 Doctor appointment</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="name-label">Medicine name</label>
+      <input class="form-input" id="form-name" placeholder="e.g. Metformin 500mg" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" id="time-label">Time</label>
+        <input class="form-input" id="form-time" type="time" />
+      </div>
+      <div class="form-group" id="freq-group">
+        <label class="form-label">Frequency</label>
+        <select class="form-select" id="form-freq">
+          <option value="Daily">Daily</option>
+          <option value="Twice daily">Twice daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="As needed">As needed</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" id="date-group" style="display:none">
+      <label class="form-label">Appointment date</label>
+      <input class="form-input" id="form-date" type="date" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">For family member</label>
+      <select class="form-select" id="form-member"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('add-modal')">Cancel</button>
+      <button class="btn-save" onclick="saveReminder()">Save reminder</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal-overlay" id="member-modal">
+  <div class="modal">
+    <div class="modal-title">Add family member</div>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input class="form-input" id="member-name" placeholder="e.g. Dadi, Papa, Riya..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Choose an emoji</label>
+      <div class="emoji-picker" id="emoji-picker"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('member-modal')">Cancel</button>
+      <button class="btn-save" onclick="saveMember()">Add member</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── DATA ──
+  const EMOJIS = ['👨','👩','👴','👵','👦','👧','🧑','👮','🧓','🧒'];
+  let selectedEmoji = EMOJIS[0];
+
+  function getData() {
+    return JSON.parse(localStorage.getItem('medsaathi') || '{"members":[],"reminders":[]}');
+  }
+  function saveData(d) { localStorage.setItem('medsaathi', JSON.stringify(d)); }
+
+  // ── INIT ──
+  window.onload = () => {
+    // seed default members if empty
+    let d = getData();
+    if (d.members.length === 0) {
+      d.members = [
+        { id: 'self', name: 'Me', emoji: '🧑' },
+        { id: 'm1',   name: 'Papa', emoji: '👨' },
+        { id: 'm2',   name: 'Maa',  emoji: '👩' },
+      ];
+      saveData(d);
+    }
+    setDate();
+    setGreeting();
+    renderMembers();
+    renderAll();
+    buildEmojiPicker();
+    updateStreak();
+  };
+
+  // ── DATE & GREETING ──
+  function setDate() {
+    const now = new Date();
+    document.getElementById('date-badge').textContent = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
+  }
+  function setGreeting() {
+    const h = new Date().getHours();
+    const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('greeting').textContent = g + '! 👋';
+  }
+
+  // ── ACTIVE MEMBER ──
+  let activeMember = null;
+  function getActiveMember() {
+    const d = getData();
+    if (!activeMember && d.members.length) activeMember = d.members[0].id;
+    return activeMember;
+  }
+
+  // ── RENDER MEMBERS ──
+  function renderMembers() {
+    const d = getData();
+    const bar = document.getElementById('family-bar');
+    // remove old chips
+    bar.querySelectorAll('.member-chip').forEach(c => c.remove());
+    const addBtn = bar.querySelector('.add-member-btn');
+    const active = getActiveMember();
+    d.members.forEach(m => {
+      const chip = document.createElement('button');
+      chip.className = 'member-chip' + (m.id === active ? ' active' : '');
+      chip.innerHTML = `<span class="member-avatar">${m.emoji}</span>${m.name}`;
+      chip.onclick = () => { activeMember = m.id; renderMembers(); renderAll(); };
+      bar.insertBefore(chip, addBtn);
+    });
+  }
+
+  // ── RENDER ALL ──
+  function renderAll() {
+    const d = getData();
+    const mid = getActiveMember();
+    const types = ['medicine','water','meal','doctor'];
+    let totalToday = 0, doneToday = 0, upcoming = 0;
+    const today = new Date().toDateString();
+
+    types.forEach(type => {
+      const items = d.reminders.filter(r => r.member === mid && r.type === type);
+      const list = document.getElementById('list-' + type);
+      list.innerHTML = '';
+
+      if (!items.length) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${typeIcon(type)}</div><div class="empty-state-text">No ${typeName(type)} added yet</div></div>`;
+      } else {
+        items.forEach(r => {
+          const isDone = r.doneDate === today;
+          if (type !== 'doctor') { totalToday++; if (isDone) doneToday++; }
+          if (type === 'doctor') upcoming++;
+          const item = document.createElement('div');
+          item.className = 'reminder-item';
+          item.innerHTML = `
+            <button class="reminder-check ${isDone ? 'checked' : ''}" onclick="toggleDone('${r.id}')">${isDone ? '✓' : ''}</button>
+            <div class="reminder-info">
+              <div class="reminder-name ${isDone ? 'done' : ''}">${r.name}</div>
+              <div class="reminder-time">${r.time || r.date || r.freq || ''}</div>
+            </div>
+            <button class="reminder-delete" onclick="deleteReminder('${r.id}')" title="Delete">✕</button>
+          `;
+          list.appendChild(item);
+        });
+      }
+
+      // update count labels
+      const countEl = document.getElementById(type === 'doctor' ? 'doc-count' : type === 'medicine' ? 'med-count' : type === 'water' ? 'water-count' : 'meal-count');
+      if (countEl) countEl.textContent = items.length + (type === 'doctor' ? ' appointments' : ' reminders');
+    });
+
+    // stats
+    document.getElementById('stat-total').textContent = totalToday;
+    document.getElementById('stat-done').textContent = doneToday;
+    document.getElementById('stat-upcoming').textContent = upcoming;
+
+    // nav badge
+    const meds = d.reminders.filter(r => r.member === mid && r.type === 'medicine').length;
+    document.getElementById('med-badge').textContent = meds;
+  }
+
+  function typeIcon(t) { return {medicine:'💊',water:'💧',meal:'🍽️',doctor:'🩺'}[t] || '📋'; }
+  function typeName(t) { return {medicine:'medicines',water:'water reminders',meal:'meal reminders',doctor:'appointments'}[t] || t; }
+
+  // ── TOGGLE DONE ──
+  function toggleDone(id) {
+    const d = getData();
+    const r = d.reminders.find(x => x.id === id);
+    if (!r) return;
+    const today = new Date().toDateString();
+    r.doneDate = r.doneDate === today ? null : today;
+    saveData(d);
+    renderAll();
+    updateStreak();
+  }
+
+  // ── DELETE ──
+  function deleteReminder(id) {
+    const d = getData();
+    d.reminders = d.reminders.filter(x => x.id !== id);
+    saveData(d);
+    renderAll();
+  }
+
+  // ── STREAK ──
+  function updateStreak() {
+    const d = getData();
+    const mid = getActiveMember();
+    const reminders = d.reminders.filter(r => r.member === mid && r.type !== 'doctor');
+    if (!reminders.length) { document.getElementById('stat-streak').textContent = 0; return; }
+    let streak = 0;
+    for (let i = 0; i < 30; i++) {
+      const day = new Date(); day.setDate(day.getDate() - i);
+      const ds = day.toDateString();
+      const allDone = reminders.every(r => r.doneDate === ds);
+      if (allDone) streak++; else if (i > 0) break;
+    }
+    document.getElementById('stat-streak').textContent = streak;
+  }
+
+  // ── ADD MODAL ──
+  let presetType = null;
+  function openAddModal(type) {
+    presetType = type || 'medicine';
+    document.getElementById('form-type').value = presetType;
+    onTypeChange();
+    // populate member dropdown
+    const d = getData();
+    const sel = document.getElementById('form-member');
+    sel.innerHTML = d.members.map(m => `<option value="${m.id}" ${m.id === getActiveMember() ? 'selected' : ''}>${m.emoji} ${m.name}</option>`).join('');
+    // reset fields
+    document.getElementById('form-name').value = '';
+    document.getElementById('form-time').value = '';
+    document.getElementById('form-date').value = '';
+    openModal('add-modal');
+  }
+
+  function onTypeChange() {
+    const t = document.getElementById('form-type').value;
+    const labels = { medicine: ['Medicine name','Time to take'], water: ['Reminder label','Time'], meal: ['Meal name','Time'], doctor: ['Doctor / Hospital name','Appointment time'] };
+    const l = labels[t] || ['Name','Time'];
+    document.getElementById('name-label').textContent = l[0];
+    document.getElementById('time-label').textContent = l[1];
+    document.getElementById('date-group').style.display = t === 'doctor' ? 'block' : 'none';
+    document.getElementById('freq-group').style.display = t === 'doctor' ? 'none' : 'block';
+    const placeholders = { medicine: 'e.g. Metformin 500mg', water: 'e.g. Drink water', meal: 'e.g. Breakfast', doctor: 'e.g. Dr. Sharma — City Clinic' };
+    document.getElementById('form-name').placeholder = placeholders[t] || '';
+  }
+
+  function saveReminder() {
+    const name = document.getElementById('form-name').value.trim();
+    if (!name) { document.getElementById('form-name').focus(); return; }
+    const d = getData();
+    const type = document.getElementById('form-type').value;
+    const reminder = {
+      id: Date.now().toString(),
+      type,
+      name,
+      time: document.getElementById('form-time').value,
+      freq: document.getElementById('form-freq') ? document.getElementById('form-freq').value : '',
+      date: document.getElementById('form-date').value,
+      member: document.getElementById('form-member').value,
+      doneDate: null,
+    };
+    d.reminders.push(reminder);
+    saveData(d);
+    closeModal('add-modal');
+    renderAll();
+  }
+
+  // ── MEMBER MODAL ──
+  function buildEmojiPicker() {
+    const picker = document.getElementById('emoji-picker');
+    picker.innerHTML = '';
+    EMOJIS.forEach((e, i) => {
+      const btn = document.createElement('div');
+      btn.className = 'emoji-opt' + (i === 0 ? ' selected' : '');
+      btn.textContent = e;
+      btn.onclick = () => {
+        picker.querySelectorAll('.emoji-opt').forEach(x => x.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedEmoji = e;
+      };
+      picker.appendChild(btn);
+    });
+    selectedEmoji = EMOJIS[0];
+  }
+
+  function openMemberModal() {
+    document.getElementById('member-name').value = '';
+    buildEmojiPicker();
+    openModal('member-modal');
+  }
+
+  function saveMember() {
+    const name = document.getElementById('member-name').value.trim();
+    if (!name) { document.getElementById('member-name').focus(); return; }
+    const d = getData();
+    d.members.push({ id: Date.now().toString(), name, emoji: selectedEmoji });
+    saveData(d);
+    closeModal('member-modal');
+    renderMembers();
+    renderAll();
+  }
+
+  // ── MODAL HELPERS ──
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // close on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  });
+
+  // ── NAV TABS ──
+  function setTab(tab) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+  }
+
+  // ── SIDEBAR TOGGLE (mobile) ──
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+</script>
+</body>
+</html>
